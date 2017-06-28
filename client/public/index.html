@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="stylesheet" type="text/css" href="index.css">
+  <link rel="stylesheet" type="text/css" href="katex.css">
+  <link rel="stylesheet" type="text/css" href="prism.css">
+  <!--<link href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.css" rel="stylesheet">-->
+  <!--
+      Notice the use of %PUBLIC_URL% in the tag above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+  <title>My Wiki</title>
+  <style>
+    body {
+      min-height: 100vh;
+    }
+
+    .answers {
+      padding-left: 10px;
+    }
+
+    strong {
+      color: #4367b1;
+    }
+
+    .footer {}
+
+    .topic-card {
+      width: 300px;
+      height: 150px;
+      background: linear-gradient(180deg, #4367b1 50%, #fff 50%);
+      border: thin solid #000;
+    }
+
+    .topic-card:hover {
+      box-shadow: 0px 0px 10px #ccc;
+    }
+
+    .topic-card-title {
+      margin: 80px 0px 0px 00px;
+      align-items: center;
+    }
+    #nounder {
+      text-decoration: none;
+    }
+    #answers {
+      max-width: 100%;
+    }
+    .grommetux-collapsible {
+      align-items: center;
+    }
+    .grommetux-tiles {
+      min-height: 80vh;
+    }
+    pre code {
+      font-size: .5em;
+      padding: 5px;
+      margin: 5px;
+    }
+    .mypre {
+      padding: 5px;
+      margin: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+    <script src="/prism.js"></script>
+</body>
+
+</html>

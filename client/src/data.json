@@ -1,0 +1,256 @@
+{
+    "/": [
+        {
+            "code": "ml",
+            "name": "Machine Learning"
+        },
+        {
+            "code": "programming",
+            "name": "Programming"
+        }
+    ],
+    "/ml": [
+        {
+            "code": "ml-basics",
+            "name": "Machine Learning Basics"
+        },
+        {
+            "code": "dl-basics",
+            "name": "Deep Learning Basics"
+        }
+    ],
+    "/ml/dl-basics": [
+        {
+            "a": [
+                {
+                    "content": "ReLu is $y=ax$. This is on [baidu](https://www.baidu.com)\n\n",
+                    "type": "md"
+                }
+            ],
+            "id": "9",
+            "q": "What is a ReLu activation function?"
+        }
+    ],
+    "/ml/ml-basics": [
+        {
+            "code": "supervised-learning",
+            "name": "Supervised Learning"
+        },
+        {
+            "code": "basics",
+            "name": "Basics"
+        }
+    ],
+    "/ml/ml-basics/basics": [
+        {
+            "a": [
+                {
+                    "content": "Without touching the testing data, among __training data__, split into $k$ parts. Use one part as testing data each time.\n\n",
+                    "type": "md"
+                }
+            ],
+            "id": "4",
+            "q": "What is $k$-fold cross validation?"
+        },
+        {
+            "a": [
+                {
+                    "content": "todo\n\n",
+                    "type": "md"
+                }
+            ],
+            "id": "5",
+            "q": "What is back-propagation?"
+        },
+        {
+            "a": [
+                {
+                    "content": "A __softmax__ classifier is a generalization of the binary logistic regression classifier. $L_i = - \\log{(\\frac{e^{f_{y_i}}}{\\sum\\limits_j e^{f_j}})} = -f_{y_i} + \\log{\\sum\\limits_j e^{f_j}}$. When implementing __softmax__, we do this trick to combat dividing large numbers.\n",
+                    "type": "md"
+                },
+                {
+                    "content": "# f has very large scores so it's numerically unstable to take exponentials\nf = np.array([123, 456, 789])\n# shift values of f so that the highest number is 0:\nf -= np.max(f) # f becomes [-666, -333, 0]\np = np.exp(f) / np.sum(np.exp(f))",
+                    "type": "code"
+                },
+                {
+                    "content": "![SVM vs. Softmax](http://cs231n.github.io/assets/svmvssoftmax.png \"SVM vs. Softmax\")\n\n> The Softmax classifier is never fully happy with the scores it produces: the correct class could always have a higher probability and the incorrect classes always a lower probability and the loss would always get better. However, the SVM is happy once the margins are satisfied and it does not micromanage the exact scores beyond this constraint.\n\n",
+                    "type": "md"
+                }
+            ],
+            "id": "6",
+            "q": "What is __softmax__ classifier?"
+        },
+        {
+            "a": [
+                {
+                    "content": "$L_i=\\sum\\limits_{j\\neq y_i} \\max{(0, s_j - s_{y_i} + \\Delta)}$.\n\nThis means we want the score of the correct class to be higher than all other scores by at least $\\Delta$.\n\n",
+                    "type": "md"
+                }
+            ],
+            "id": "7",
+            "q": "What loss function is usually used for Multiclass Support Vector Machine?"
+        },
+        {
+            "a": [
+                {
+                    "content": "- $L_1$: $d_1(I_1, I_2) = \\sum\\limits_{p}|I_1^p - I_2^p|$\n- $L_2$: $d_2(I_1, I_2) = \\sqrt{\\sum\\limits_{p}(I_1^p - I_2^p)^2}$\n$L_2$ prefers many medium disagreements to one big one.\n\n",
+                    "type": "md"
+                }
+            ],
+            "id": "8",
+            "q": "What are the differences between $L_1$ and $L_2$ distances?"
+        }
+    ],
+    "/ml/ml-basics/supervised-learning": [
+        {
+            "a": [
+                {
+                    "content": "If the _predictor variable_ $y$ is continuous, we call it a **regression problem;** **classification** if discrete\n\n",
+                    "type": "md"
+                }
+            ],
+            "id": "0",
+            "q": "What are **regression** and **classification** problems?"
+        },
+        {
+            "a": [
+                {
+                    "content": "We model a _linear regression_ as $h(x) = \\sum\\limits_{i=0}^n \\theta_i x_i$, where $x_i$ is the $i$th input, a vector of length equal to the number of features. Its _cost function_ is just the least squares $J(\\theta)=\\frac{1}{2} \\sum\\limits_{i=1}^m(h_\\theta(x^{(i)}) -  y^{(i)})^2$\n\n",
+                    "type": "md"
+                }
+            ],
+            "id": "1",
+            "q": "What is a **Linear Regression** and its **cost function**?"
+        },
+        {
+            "a": [
+                {
+                    "content": "We use **gradient descent**. There are two types:\n\n* **Batch gradient descent**\n  `while not converge:` $\\theta_j = \\theta_j + \\alpha \\sum\\limits_{i=1}^m (y^{(i)} - h_{\\theta}(x^{(i)}))x_j^{(i)}$. It looks at all training data at each step. It always converges because there are no local optima.\n\n* **Stochastic gradient descent**\n\n",
+                    "type": "md"
+                },
+                {
+                    "content": "for i in xrange(100):\n    print i",
+                    "type": "code"
+                },
+                {
+                    "content": "\n$\\theta_j = \\theta_j + \\alpha(y^{(i)} - h_{\\theta}(x^{(i)})) x_j^{(i)}$\n\nWe repeatedly run through the training set, each tme we see an example, we update the parameters according to the error gradient of that single training example only.\n\n",
+                    "type": "md"
+                }
+            ],
+            "id": "2",
+            "q": "How to algorithmically minimize the cost? What are the differences between two types of **gradient descent**?"
+        },
+        {
+            "a": [
+                {
+                    "content": "- Normalize the data to have zero mean and unit variance\n\n- If data high-dimensional, consider reduce dimension using __PCA__\n\n- Use cross validation, and different types of distance function\n\n- Use Approximate Nearest Neighbor Libraries like [FLANN](http://www.cs.ubc.ca/research/flann/) to accelerate.\n\n",
+                    "type": "md"
+                }
+            ],
+            "id": "3",
+            "q": "What are some kNN techniques?"
+        },
+        {
+            "a": [
+                {
+                    "content": "Cross Validation is something $a^2 + b^2$.\n\n",
+                    "type": "md"
+                }
+            ],
+            "id": "10",
+            "q": "What is cross validation $1 + \\frac{1}{2} = \\frac{3}{2}$?"
+        }
+    ],
+    "/programming": [
+        {
+            "code": "python",
+            "name": "Python"
+        },
+        {
+            "code": "misc",
+            "name": "Misc."
+        }
+    ],
+    "/programming/misc": [
+        {
+            "a": [
+                {
+                    "content": "[AWS](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html)\n\n[Digital Ocean](https://www.digitalocean.com/community/tutorials/how-to-create-your-first-digitalocean-droplet-virtual-server)\n\n#### To set up digital ocean:\n\n",
+                    "type": "md"
+                },
+                {
+                    "content": "eval `ssh-agent -s`\nssh-add ~/.ssh/do_rsa",
+                    "type": "code"
+                },
+                {
+                    "content": "\n#### To connect to the VPS\n\n",
+                    "type": "md"
+                },
+                {
+                    "content": "ssh kai@107.170.217.101",
+                    "type": "code"
+                },
+                {
+                    "content": "\n",
+                    "type": "md"
+                }
+            ],
+            "id": "13",
+            "q": "How to host a virtual private server(VPS)?"
+        }
+    ],
+    "/programming/python": [
+        {
+            "a": [
+                {
+                    "content": "",
+                    "type": "md"
+                },
+                {
+                    "content": "print json.dumps(response, sort_keys=True, indent=4, separators=(',', ': '))",
+                    "type": "code"
+                },
+                {
+                    "content": "\n",
+                    "type": "md"
+                }
+            ],
+            "id": "11",
+            "q": "How to pretty-print JSON in Python?"
+        },
+        {
+            "a": [
+                {
+                    "content": "1. Compile a `RE` object using `re.compile('ab*')`\n\n2. Use the following methods on the `RE` object for matching\n\n   > * `match()` checks if `RE` matches at the beginning\n\n   > * `search()` checks if `RE` matches at any place\n\n   > * `findall()` find all substrings where `RE` matches and returns a list\n\n   > * `finditer()` returns an iterator\n\n\n3. A `match` object has the following methods:\n\n   > * `group(0)` returns the string matched by `RE`\n\n   > * `start()` returns the starting position\n\n   > * `end()` returns the ending position\n\n   > * `span()` returns a tuple containing `(start, end)`\n\n\n#### Code example:\n\n",
+                    "type": "md"
+                },
+                {
+                    "content": "p = re.compile('(@\\d+)')\nfor match in p.finditer(content):\n    start, end = match.span()",
+                    "type": "code"
+                },
+                {
+                    "content": "\n",
+                    "type": "md"
+                }
+            ],
+            "id": "12",
+            "q": "How to use Regex in Python?"
+        }
+    ],
+    "id2slug": {
+        "0": "/ml/ml-basics/supervised-learning",
+        "1": "/ml/ml-basics/supervised-learning",
+        "10": "/ml/ml-basics/supervised-learning",
+        "11": "/programming/python",
+        "12": "/programming/python",
+        "13": "/programming/misc",
+        "2": "/ml/ml-basics/supervised-learning",
+        "3": "/ml/ml-basics/supervised-learning",
+        "4": "/ml/ml-basics/basics",
+        "5": "/ml/ml-basics/basics",
+        "6": "/ml/ml-basics/basics",
+        "7": "/ml/ml-basics/basics",
+        "8": "/ml/ml-basics/basics",
+        "9": "/ml/dl-basics"
+    }
+}
