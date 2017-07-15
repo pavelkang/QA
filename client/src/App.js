@@ -3,32 +3,40 @@ import React, {Component} from 'react';
 import App from 'grommet/components/App';
 import Title from 'grommet/components/Title';
 import Header from 'grommet/components/Header';
-import Section from 'grommet/components/Section';
 import Box from 'grommet/components/Box';
 import Search from 'grommet/components/Search';
-import Accordion from 'grommet/components/Accordion';
-import Paragraph from 'grommet/components/Paragraph';
-import AccordionPanel from 'grommet/components/AccordionPanel';
 import Button from 'grommet/components/Button';
-import Latex from 'react-latex';
 import Footer from 'grommet/components/Footer';
 import Menu from 'grommet/components/Menu';
-import Anchor from 'grommet/components/Anchor';
-import TopicsView from './TopicsView';
-import Prism from 'prismjs/prism.js'
+import WikiEditor from './WikiEditor';
+import WikiList from './WikiList';
+import MyFooter from './MyFooter';
 import {
   BrowserRouter as Router,
   Route,
   Link
 } from 'react-router-dom';
-import UserSettingsIcon from 'grommet/components/icons/base/UserSettings';
 import EditIcon from 'grommet/components/icons/base/Edit';
+import BookIcon from 'grommet/components/icons/base/Book';
 import data from './data.json';
+import UserSettings from './UserSettings';
+import axios from 'axios';
+import LoginPage from './LoginPage';
+import RegisterPage from './RegisterPage';
+import AboutPage from './AboutPage';
+import ProfilePage from './ProfilePage';
 
 export default () => (
-  <Router>
-    <Route path="*" component={Page} />
-  </Router>
+    <Router>
+    <div>
+    <Route path="/" exact component={Page} />
+    <Route path="/editor" component={WikiEditor} />
+    <Route path="/login" component={LoginPage} />
+    <Route path="/register" component={RegisterPage} />
+    <Route path="/about" component={AboutPage} />
+    <Route path="/profile" component={ProfilePage} />
+  </div>
+    </Router>
 );
 
 var getLastSlashInd = function(slug) {
@@ -96,91 +104,67 @@ var shouldRenderTopic = function(url, slug) {
 
 class Page extends Component {
 
-  onCreateNewWiki() {
+  constructor(props) {
+    super(props);
+    // TODO: make ajax
+
+    axios.get('/api/get_wiki')
+    .then(
+      (r) => {
+        this.setState({
+          wikis: r.data,
+        });
+      }
+    )
+
+    this.state = {
+      wikis: null,
+    };
+
+  }
+
+  onClickEdit() {
     return ;
   }
 
   render() {
-    var content;
-    var slug = getSlug(this.props.match.url);
-    if (shouldRenderTopic(this.props.match.url, slug)) {
-      content = <TopicsView topics={data[slug]} currUrl={slug}/>
-    } else {
-      content = <QAView qas={data[slug]} url={this.props.match.url} />
-    }
     return (
     <App>
     <Header>
-    <Title>{getCurrTopic(this.props.match.url)}</Title>
+    <Title>
+      <BookIcon />
+      MyWiki
+    </Title>
     <Box flex={true}
       justify='end'
       direction='row'
       responsive={false}>
     <Search inline={true}
-  fill={true}
-  size='medium'
-  responsive={true}
-  iconAlign={'start'}
-  placeHolder='Search: Not Implemented Yet'
-  dropAlign={{"right": "right"}} />
-</Box>
-<Button icon={<EditIcon />}
-  onClick={this.onCreateNewWiki.bind(this)}
-  accent={false}
-  critical={false}
-  plain={false}
-  secondary={false} />
-<Menu icon={<UserSettingsIcon />}
-  dropAlign={{"right": "right"}}>
-  <Anchor href='#'>
-    Profile
-  </Anchor>
-</Menu>
+      fill={true}
+      size='medium'
+      responsive={true}
+      iconAlign={'start'}
+      placeHolder='Search: Not Implemented Yet'
+      dropAlign={{"right": "right"}} />
+    </Box>
+
+      <Link to={'/editor'} replace>
+      <Button icon={<EditIcon />}
+      onClick={this.onClickEdit.bind(this)}
+      accent={false}
+      critical={false}
+      plain={false}
+      secondary={false} />
+      </Link>
+      <UserSettings />
     </Header>
-
-    {content}
-
-<Footer justify='between' primary={false} className="footer">
-  <Title>
-    <Link to="/" id="nounder">MyQA</Link>
-  </Title>
-  <Box direction='row'
-    align='center'
-    pad={{"between": "medium"}}>
-    <Paragraph margin='none'>
-      © 2017 Kang, Kai
-    </Paragraph>
-    <Menu direction='row'
-      size='small'
-      dropAlign={{"right": "right"}}>
-      <Anchor href='#'>
-        Contact
-      </Anchor>
-      <Anchor href='#'>
-        About
-      </Anchor>
-    </Menu>
-  </Box>
-</Footer>
+    <div className="content">
+      <WikiList data={this.state.wikis} />
+    </div>
+    <MyFooter />
     </App>
     )
   }
-}
-
-var md = require('markdown-it')(),
-    mk = require('markdown-it-katex');
-md.use(mk);
-
-var getTitleDOM = function(titleStr, id) {
-  var x = md.render(titleStr);
-  x = x.substring(3, x.length - 5); // remove <p></p>
-  x = "(" + id + ") " + x;
-  return <div dangerouslySetInnerHTML={{__html: x}}></div>;
-}
-
-var getMDHTMLString = function(s) {
-  var x = md.render(s);
-  return x;
 }
 
 var activePanels = function(d, url, qas) {
@@ -204,46 +188,6 @@ var activePanels = function(d, url, qas) {
     }
   }
   return [0];
-}
-
-
-class QAView extends Component {
-
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-    <Section>
-
-    <Accordion active={activePanels(data, this.props.url, this.props.qas)}>
-
-      {
-        this.props.qas.map((qa, ind) => {
-
-          var html_string = "";
-          for (var i = 0; i < qa.a.length; i++) {
-            if (qa.a[i].type === "code") {
-              var code = Prism.highlight(qa.a[i].content, Prism.languages['python']);
-              html_string = html_string.concat('<pre class="language-python mypre"><code class="language-python">' + code + '</code></pre>'  );
-            } else {
-              html_string = html_string.concat(getMDHTMLString(qa.a[i].content));
-            }
-          }
-          return (
-            <AccordionPanel heading={getTitleDOM(qa.q, qa.id)} key={ind}>
-              <Paragraph className='answers' align="start" margin="none" size="large" dangerouslySetInnerHTML={{__html:html_string}}>
-              </Paragraph>
-            </AccordionPanel>
-          );
-        })
-      }
-
-    </Accordion>
-    </Section>
-    );
-  }
 }
 
 /*

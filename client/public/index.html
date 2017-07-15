@@ -8,6 +8,7 @@
   <link rel="stylesheet" type="text/css" href="index.css">
   <link rel="stylesheet" type="text/css" href="katex.css">
   <link rel="stylesheet" type="text/css" href="prism.css">
+  <link rel="stylesheet" type="text/css" href="draft.css">
   <!--<link href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.css" rel="stylesheet">-->
   <!--
       Notice the use of %PUBLIC_URL% in the tag above.
@@ -32,7 +33,9 @@
       color: #4367b1;
     }
 
-    .footer {}
+    .content {
+      min-height: 80vh;
+    }
 
     .topic-card {
       width: 300px;
@@ -55,11 +58,9 @@
     #answers {
       max-width: 100%;
     }
-    .grommetux-collapsible {
+    .answer {
+      justify-content: center;
       align-items: center;
-    }
-    .grommetux-tiles {
-      min-height: 80vh;
     }
     pre code {
       font-size: .5em;
@@ -70,6 +71,55 @@
       padding: 5px;
       margin: 5px;
     }
+    .RichEditor-root {
+      background: #fff;
+      border: 1px solid #ddd;
+      font-size: 14px;
+      padding: 10px;
+    }
+   #answer-tag {
+       margin: 5px;
+   }
+   #register-text {
+       padding-left: 24px;
+   }
+    .RichEditor-editor {
+      cursor: text;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .RichEditor-editor .public-DraftEditorPlaceholder-root,
+    .RichEditor-editor .public-DraftEditor-content {
+      margin: 0 -15px -15px;
+      padding: 15px;
+    }
+
+    .RichEditor-editor .public-DraftEditor-content {
+      min-height: 50vh;
+      max-height: 50vh;
+      overflow-y: scroll;
+    }
+
+    .RichEditor-hidePlaceholder .public-DraftEditorPlaceholder-root {
+      display: none;
+    }
+
+    .RichEditor-editor .RichEditor-blockquote {
+      border-left: 5px solid #eee;
+      color: #666;
+      font-style: italic;
+      margin: 16px 0;
+      padding: 10px 20px;
+    }
+
+    .RichEditor-editor .public-DraftStyleDefault-pre {
+      background-color: rgba(0, 0, 0, 0.05);
+      font-family: 'Inconsolata', 'Menlo', 'Consolas', monospace;
+      font-size: 16px;
+      padding: 20px;
+    }
+
   </style>
 </head>
 
