@@ -16,6 +16,33 @@ import {Editor, EditorState} from 'draft-js';
 import axios from 'axios';
 import RenderedContent from './RenderedContent';
 import Spinning from 'grommet/components/icons/Spinning';
+import Select from 'grommet/components/Select';
+
+var prepareOptions = function(options) {
+  if (!options) {
+    return [{'label': <Spinning />, 'value': null}];
+  }
+  var result = [];
+  for (var i = 0; i < options.length; i++) {
+    result.push({
+      'label': options[i].name,
+      'value': options[i],
+    });
+  }
+  console.log(result);
+  return result;
+}
+
+var displayTags = function(tags) {
+  if (tags.length === 0) {
+    return "No tags";
+  }
+  var result = tags[0];
+  for (var i = 1; i < tags.length; i++) {
+    result.concat(', ' + tags[i]);
+  }
+  return result;
+}
 
 export default class WikiEditor extends Component {
 
@@ -26,7 +53,21 @@ export default class WikiEditor extends Component {
       editorState: EditorState.createEmpty(),
       previewOpen: false,
       previewingContent: null,
+      tagOptions: null,
+      tags: [],
     };
+    axios.get('/api/get_tags')
+      .then((r) => {
+        this.setState({
+          tagOptions: r.data.tags,
+        });
+      })
+  }
+
+  changeTags(o) {
+    this.setState({
+      tags: o.value,
+    });
   }
 
   onQuestionChange(e) {
@@ -62,31 +103,38 @@ export default class WikiEditor extends Component {
     });
   }
 
-  saveDraft() {
+  getContent() {
     var contentState = this.state.editorState.getCurrentContent();
     var answerInText = contentState.getPlainText();
-    axios.post('/api/save_draft', {
+    var tagIds = this.state.tags.map((o) => {
+      return o.value.id;
+    });
+    return {
       q: this.state.question,
       a: answerInText,
-    })
+      tagIds: tagIds,
+    };
+  }
+
+  saveDraft() {
+
+    axios.post('/api/save_draft', this.getContent())
       .then((r) => {
         alert('saved!');
+        window.location.href = "/";
       });
   }
 
   submit() {
-    var contentState = this.state.editorState.getCurrentContent();
-    var answerInText = contentState.getPlainText();
-    axios.post('/api/add_wiki', {
-      q: this.state.question,
-      a: answerInText,
-    })
+    axios.post('/api/add_wiki', this.getContent())
       .then((r) => {
         window.location.href = "/";
       });
   }
 
   render() {
+    console.log(this.props.match);
+    console.log(this.props.location);
     return (
         <App>
         <Header>
@@ -111,12 +159,15 @@ export default class WikiEditor extends Component {
       value={this.state.question}
       onDOMChange={this.onQuestionChange.bind(this)}/>
         <br />
-        <h4 id="answer-tag">Answer</h4>
-        <div className="RichEditor-root">
 
+        <div className="RichEditor-root">
+        <h4 id="answer-tag">Answer</h4>
         <div className="RichEditor-editor">
         <Editor editorState={this.state.editorState} onChange={this.onAnswerChange.bind(this)} />
         </div>
+        </div>
+        <div id="tag-selector">
+        <Select multiple={true} options={prepareOptions(this.state.tagOptions)} onChange={this.changeTags.bind(this)} value={this.state.tags}/>
         </div>
         <Box align="center" pad='medium'>
         <Button icon={<AddIcon />}

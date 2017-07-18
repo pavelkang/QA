@@ -8,7 +8,7 @@
   <link rel="stylesheet" type="text/css" href="index.css">
   <link rel="stylesheet" type="text/css" href="katex.css">
   <link rel="stylesheet" type="text/css" href="prism.css">
-  <link rel="stylesheet" type="text/css" href="draft.css">
+  <link rel="stylesheet" type="text/css" href="draft.css"">
   <!--<link href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.css" rel="stylesheet">-->
   <!--
       Notice the use of %PUBLIC_URL% in the tag above.
@@ -75,18 +75,33 @@
       background: #fff;
       border: 1px solid #ddd;
       font-size: 14px;
-      padding: 10px;
+      padding: 23px;
     }
-   #answer-tag {
-       margin: 5px;
-   }
    #register-text {
        padding-left: 24px;
+   }
+   .list-body {
+       position: relative;
+   }
+   .list-content {
+   }
+   .actions-menu {
+   }
+   .list-body > .actions-menu {
+       position: absolute;
+       top: 10px;
+       left: 10px;
+   }
+   #tag-selector {
+       margin-top: 15px;
+   }
+   #answer-tag {
+       margin: 0px;
    }
     .RichEditor-editor {
       cursor: text;
       font-size: 16px;
-      margin-top: 10px;
+      margin-top: 5px;
     }
 
     .RichEditor-editor .public-DraftEditorPlaceholder-root,

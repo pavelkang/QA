@@ -39,17 +39,47 @@ class User(db.Model):
             'username': self.username,
         }
 
+draft_category_association = db.Table('draft_category',
+    db.Column('draft_id', db.Integer, db.ForeignKey('draft.id')),
+    db.Column('category_id', db.Integer, db.ForeignKey('category.id'))
+)
+
+wiki_category_association = db.Table('wiki_category',
+    db.Column('wiki_id', db.Integer, db.ForeignKey('wiki.id')),
+    db.Column('category_id', db.Integer, db.ForeignKey('category.id'))
+)
 
 class Category(db.Model):
     __tablename__ = 'category'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
+    owner = db.relationship('User',
+                            backref=db.backref('categories', lazy='dynamic'))
+    wikis = db.relationship(
+        "Wiki",
+        secondary=wiki_category_association,
+        backref="categories")
+    drafts = db.relationship(
+        "Draft",
+        secondary=draft_category_association,
+        backref="categories")
 
-    def __init__(self, name):
+    def __init__(self, name, owner_id):
         self.name = name
+        self.owner_id = owner_id
+
+    @declared_attr
+    def owner_id(cls):
+        return db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
         return '<Category %r>' % self.name
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
 
 
 class ContentMixin(object):
@@ -97,6 +127,7 @@ class ContentMixin(object):
             'author_id': self.author_id,
         }
 
+
 class Draft(db.Model, ContentMixin):
     __tablename__ = 'draft'
     ts_created = db.Column(db.DateTime,
@@ -117,6 +148,7 @@ class Draft(db.Model, ContentMixin):
         })
         return output
 
+
 class Wiki(db.Model, ContentMixin):
     __tablename__ = 'wiki'
     ts_published = db.Column(db.DateTime,
@@ -135,6 +167,9 @@ class Wiki(db.Model, ContentMixin):
 
     def serialize(self, isEditing=False):
         output = ContentMixin.serialize(self)
+        output.update({
+            'ts_published': self.ts_published,
+        })
         if isEditing:
             output['raw_question'] = self.raw_question
             output['raw_answer'] = self.raw_answer
@@ -142,3 +177,25 @@ class Wiki(db.Model, ContentMixin):
             output['q'] = self.question
             output['a'] = ContentMixin.parse_answer(self.answer)
         return output
+
+
+# Associations
+
+
+# class DraftCategory(db.Model):
+#     __tablename__ = 'draft_category'
+#     #extend existing table using table association
+#     __table_args__ = {'extend_existing': True}
+
+#     id = db.Column(db.Integer, primary_key=True)
+#     draft_id = db.Column(db.Integer, db.ForeignKey('draft.id'))
+#     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+
+# class WikiCategory(db.Model):
+#     __tablename__ = 'wiki_category'
+#     #extend existing table using table association
+#     __table_args__ = {'extend_existing': True}
+
+#     id = db.Column(db.Integer, primary_key=True)
+#     wiki_id = db.Column(db.Integer, db.ForeignKey('wiki.id'))
+#     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))

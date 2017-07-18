@@ -46,24 +46,32 @@ def unauthorized():
     return "No way"
 
 
-@app.route("/api/get_topics/<int:user_id>", methods=['GET'])
-def get_topics(user_id):
-    # TODO
-    pass
+@app.route("/api/add_tag", methods=['POST'])
+def add_tag():
+    if current_user is None:
+        return redirect(url_for('route_register'))
+    category = Category(request.json['tag'], current_user.id)
+    db.session.add(category)
+    db.session.commit()
+    return jsonify({})
 
-
-@app.route("/api/add_topic/<int:user_id>", methods=['GET'])
-def add_subtopic(user_id):
-    # TODO
-    pass
-
+@app.route("/api/get_tags", methods=['GET'])
+def get_tag():
+    if current_user is None:
+        return redirect(url_for('route_register'))
+    tags = map(lambda c: c.serialize(), current_user.categories)
+    return jsonify({'tags': tags})
 
 @app.route("/api/add_wiki", methods=['POST'])
 def add_wiki():
     if current_user is None:
         return redirect(url_for('route_register'))
+    print request.json
     wiki = Wiki(request.json['q'], request.json['a'], current_user.id)
-    print wiki
+    for tagId in request.json['tagIds']:
+        tag = Category.query.get(tagId)
+        if tag is not None:
+            wiki.categories.append(tag)
     db.session.add(wiki)
     db.session.commit()
     return jsonify({})
@@ -79,14 +87,32 @@ def save_draft():
 
 @app.route("/api/get_profile", methods=['GET'])
 def get_profile():
+    """
+    {
+      'username':,
+      'tags': [{'name':}],
+      'drafts': [],
+      'numWikis': ,
+    }
+    """
     if current_user is None:
         return redirect(url_for('route_register'))
-    print current_user.wiki
+    response = {
+        'username': current_user.username,
+        'tags': map(lambda c: c.serialize(), current_user.categories),
+        'drafts': [],
+        'numWikis': current_user.wiki.count(),
+    }
+    return jsonify(response)
 
-@app.route("/api/delete_wiki/<int:user_id>", methods=['POST'])
-def delete_wiki():
-    # TODO
-    pass
+@app.route("/api/delete_wiki/<int:wiki_id>", methods=['POST'])
+def delete_wiki(wiki_id):
+    wiki_to_delete = Wiki.query.get(wiki_id)
+    if wiki_to_delete.author_id == current_user.id:
+        db.session.delete(wiki_to_delete)
+        db.session.commit()
+        return jsonify({})
+    return jsonify({})
 
 
 @app.route("/api/preview", methods=['POST'])
@@ -96,10 +122,12 @@ def preview():
         'content': content,
     })
 
+
 @app.route("/api/get_wiki", methods=['GET'])
 def get_wiki():
-    wikis = current_user.wiki
-    serialized_wikis = map(lambda w: w.serialize(), wikis)
+    if current_user is None:
+        redirect(url_for('route_register'))
+    serialized_wikis = map(lambda w: w.serialize(), current_user.wiki)
     return jsonify(serialized_wikis)
 
 
@@ -123,16 +151,18 @@ def register():
 
 # Routing
 
-@app.route("/editor")
+@app.route("/editor/<int:mode>/<int:obj_id>")
 @login_required
-def route_editor():
-    return app.send_static_file('index.html')
+def route_editor(mode, obj_id):
+    return render_template('index.html')
 
 @app.route("/")
 def route_home():
+    return render_template('index.html')
     return app.send_static_file('index.html')
 
 @app.route("/profile")
+@login_required
 def route_profile():
     if current_user is None:
         return redirect(url_for('route_home'))
@@ -141,10 +171,7 @@ def route_profile():
 
 @app.route("/register")
 def route_register():
-    if current_user is not None:
-        return redirect(url_for('route_home'))
-    else:
-        return app.send_static_file('index.html')
+    return app.send_static_file('index.html')
 
 if __name__ == '__main__':
     app.secret_key = "super secret key"

@@ -30,7 +30,7 @@ export default () => (
     <Router>
     <div>
     <Route path="/" exact component={Page} />
-    <Route path="/editor" component={WikiEditor} />
+    <Route path="/editor/:mode/:object_number" component={WikiEditor} />
     <Route path="/login" component={LoginPage} />
     <Route path="/register" component={RegisterPage} />
     <Route path="/about" component={AboutPage} />
@@ -118,7 +118,16 @@ class Page extends Component {
     )
 
     this.state = {
-      wikis: null,
+      wikis: [
+      {
+        a: [{content: "test content", type: "md"}],
+        author_id: 3,
+        id: 15,
+        q: "test question",
+        question: "test question",
+        ts_published: "123",
+      }
+    ],
     };
 
   }
