@@ -1,6 +1,6 @@
 client/node_modules
 client/build
 *.pyc
-.venv
+venv
 .DS_Store
 server/migrations
