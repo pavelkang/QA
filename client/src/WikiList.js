@@ -3,7 +3,6 @@ import Accordion from 'grommet/components/Accordion';
 import AccordionPanel from 'grommet/components/AccordionPanel';
 import Timestamp from 'grommet/components/Timestamp';
 import Box from 'grommet/components/Box';
-import Columns from 'grommet/components/Columns';
 import Anchor from 'grommet/components/Anchor';
 import EditIcon from 'grommet/components/icons/base/Edit';
 import TrashIcon from 'grommet/components/icons/base/Trash';
@@ -24,11 +23,6 @@ var getTitleDOM = function(titleStr, id, ts_published) {
   return (
       <div dangerouslySetInnerHTML={{__html: x}}></div>
   );
-}
-
-var getMDHTMLString = function(s) {
-  var x = md.render(s);
-  return x;
 }
 
 export default class WikiList extends Component {
@@ -56,7 +50,7 @@ export default class WikiList extends Component {
     }
     return (
         <Box pad="small">
-        <Accordion active={[]} animate={false}>
+        <Accordion active={[]}>
         {
           this.props.data.map((qa, ind) => {
             return (
@@ -67,8 +61,8 @@ export default class WikiList extends Component {
                 <div className="actions-menu">
                 <Menu icon={<MoreIcon />}
               dropAlign={{"left": "left"}}>
-                <Anchor icon={<EditIcon />} >edit</Anchor>
-                <Anchor icon={<TrashIcon />} onClick={this.deleteWiki.bind(this, qa.id)} >delete</Anchor>
+                <Anchor icon={<EditIcon />} path={"/editor/1/"+qa.id}> edit </Anchor>
+                <Anchor icon={<TrashIcon />} onClick={this.deleteWiki.bind(this, qa.id)} > delete </Anchor>
                 </Menu>
                 </div>
 

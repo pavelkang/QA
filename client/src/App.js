@@ -6,8 +6,6 @@ import Header from 'grommet/components/Header';
 import Box from 'grommet/components/Box';
 import Search from 'grommet/components/Search';
 import Button from 'grommet/components/Button';
-import Footer from 'grommet/components/Footer';
-import Menu from 'grommet/components/Menu';
 import WikiEditor from './WikiEditor';
 import WikiList from './WikiList';
 import MyFooter from './MyFooter';
@@ -30,7 +28,7 @@ export default () => (
     <Router>
     <div>
     <Route path="/" exact component={Page} />
-    <Route path="/editor/:mode/:object_number" component={WikiEditor} />
+    <Route path="/editor/:mode?/:obj_id?" component={WikiEditor} />
     <Route path="/login" component={LoginPage} />
     <Route path="/register" component={RegisterPage} />
     <Route path="/about" component={AboutPage} />
@@ -48,58 +46,6 @@ var getLastSlashInd = function(slug) {
     }
   }
   return lastSlashInd;
-}
-
-var getCurrTopic = function(slug) {
-  if (slug === "/") {
-    return "MyQA";
-  }
-  var lastSlashInd = getLastSlashInd(slug);
-  if (lastSlashInd === -1) {
-    console.warn('no!');
-    return '';
-  }
-  if (lastSlashInd === 0) {
-    var key = "/";
-  } else {
-    var key = slug.substring(0, lastSlashInd);
-  }
-  var topics = data[key];
-  var name = "";
-  var thisCode = slug.substring(lastSlashInd+1, slug.length);
-  for (var i = 0; i < topics.length; i++) {
-    var topic = topics[i];
-    if (topic.code === thisCode) {
-      return topic.name;
-    }
-  }
-  return "";
-}
-
-var getSlug = function(url) {
-  var ind = url.indexOf('@');
-  if (ind === -1) {
-    return url;
-  }
-  return url.substring(0, ind-1); // -1 is to remove '/'
-}
-
-var shouldRenderTopic = function(url, slug) {
-
-  if (url !== slug) {
-    return false;
-  }
-
-  var l = data[slug];
-  if (l.length === 0) {
-    return false; // leaf page
-  }
-  var item = l[0];
-  if (item['code']) {
-    return true;
-  } else {
-    return false;
-  }
 }
 
 class Page extends Component {
@@ -175,44 +121,3 @@ class Page extends Component {
     )
   }
 }
-
-var activePanels = function(d, url, qas) {
-  var pound_pos = -1;
-  for (var i = 0; i < url.length; i++) {
-    if (url[i] === '@') {
-      pound_pos = i;
-      break;
-    }
-  }
-
-  if (pound_pos === -1) {
-    return [0];
-  }
-
-  var to_id = url.substr(pound_pos+1, url.length-1);
-
-  for (var i = 0; i < qas.length; i++) {
-    if (qas[i].id === to_id) {
-      return [i];
-    }
-  }
-  return [0];
-}
-
-/*
-console.log(data);
-
-    <AccordionPanel heading={getTitleDOM('What are __regression__ and __classification__ problems?')}>
-    <Paragraph className='answers' dangerouslySetInnerHTML={{__html: result}}>
-    </Paragraph>
-    </AccordionPanel>
-
-    <AccordionPanel heading='What is Linear Regression'>
-    <Paragraph className='answers' dangerouslySetInnerHTML={{__html: result}}>
-    </Paragraph>
-    </AccordionPanel>
-
-export default () => (
-
-);
-*/

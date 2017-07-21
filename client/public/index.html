@@ -4,21 +4,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="shortcut icon" href="favicon.ico">
-  <link rel="stylesheet" type="text/css" href="index.css">
-  <link rel="stylesheet" type="text/css" href="katex.css">
-  <link rel="stylesheet" type="text/css" href="prism.css">
-  <link rel="stylesheet" type="text/css" href="draft.css"">
-  <!--<link href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.css" rel="stylesheet">-->
-  <!--
-      Notice the use of %PUBLIC_URL% in the tag above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
+  <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='index.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='katex.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='prism.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='draft.css') }}">
   <title>My Wiki</title>
   <style>
     body {
@@ -37,21 +27,10 @@
       min-height: 80vh;
     }
 
-    .topic-card {
-      width: 300px;
-      height: 150px;
-      background: linear-gradient(180deg, #4367b1 50%, #fff 50%);
-      border: thin solid #000;
-    }
+   .language-python {
+       padding: 0px;
+   }
 
-    .topic-card:hover {
-      box-shadow: 0px 0px 10px #ccc;
-    }
-
-    .topic-card-title {
-      margin: 80px 0px 0px 00px;
-      align-items: center;
-    }
     #nounder {
       text-decoration: none;
     }

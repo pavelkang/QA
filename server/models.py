@@ -170,12 +170,9 @@ class Wiki(db.Model, ContentMixin):
         output.update({
             'ts_published': self.ts_published,
         })
-        if isEditing:
-            output['raw_question'] = self.raw_question
-            output['raw_answer'] = self.raw_answer
-        else:
-            output['q'] = self.question
-            output['a'] = ContentMixin.parse_answer(self.answer)
+        output['q'] = self.question
+        output['a'] = ContentMixin.parse_answer(self.answer)
+        output['raw_a'] = self.answer
         return output
 
 

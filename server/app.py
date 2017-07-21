@@ -1,6 +1,6 @@
 import jinja2
 import os
-from flask import Flask, redirect, render_template, request, jsonify, url_for
+from flask import Flask, redirect, render_template, request, jsonify, url_for, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_required, login_user, current_user
 
@@ -13,8 +13,8 @@ TEMPLATE_DIR = '{}/client/build'.format(ROOT_DIR)
 
 app = Flask(__name__,
             static_url_path='',
-            static_folder=STATIC_DIR,
-            template_folder=TEMPLATE_DIR)
+            static_folder=os.path.abspath(STATIC_DIR),
+            template_folder=os.path.abspath(TEMPLATE_DIR))
 
 template_dirs = jinja2.ChoiceLoader([
     app.jinja_loader,
@@ -66,9 +66,8 @@ def get_tag():
 def add_wiki():
     if current_user is None:
         return redirect(url_for('route_register'))
-    print request.json
     wiki = Wiki(request.json['q'], request.json['a'], current_user.id)
-    for tagId in request.json['tagIds']:
+    for tagId in request.json['content']['tagIds']:
         tag = Category.query.get(tagId)
         if tag is not None:
             wiki.categories.append(tag)
@@ -77,13 +76,63 @@ def add_wiki():
     return jsonify({})
 
 @app.route("/api/save_draft", methods=['POST'])
+@login_required
 def save_draft():
     if current_user is None:
         return redirect(url_for('route_register'))
     draft = Draft(request.json['q'], request.json['a'], current_user.id)
     db.session.add(draft)
     db.session.commit()
+    return jsonify({
+        'draft_id': draft.id,
+    })
+
+@app.route("/api/update_wiki", methods=['POST'])
+@login_required
+def update_wiki():
+    wiki = Wiki.query.get(request.json['wiki_id'])
+    wiki.question = request.json['content']['q']
+    wiki.answer = request.json['content']['a']
+    db.session.commit()
     return jsonify({})
+
+
+@app.route("/api/publish_draft", methods=['POST'])
+@login_required
+def publish_draft():
+    wiki = Wiki(request.json['content']['q'],
+                request.json['content']['a'],
+                current_user.id)
+    for tagId in request.json['content']['tagIds']:
+        tag = Category.query.get(tagId)
+        if tag is not None:
+            wiki.categories.append(tag)
+    db.session.add(wiki)
+    draft = Draft.query.get(request.json['draft_id'])
+    db.session.delete(draft)
+    db.session.commit()
+    return jsonify({})
+
+
+@app.route("/api/get_editor_data/<int:mode>/<int:obj_id>", methods=['GET'])
+@login_required
+def get_editor_data(mode, obj_id):
+    """
+    {
+      'content': JSON,
+      'tags': []
+    }
+    """
+    tags = map(lambda c: c.serialize(), current_user.categories)
+    content = None
+    if mode == 1: # editing wiki
+        content = Wiki.query.get(obj_id)
+    elif mode == 2: # editing draft
+        content = Draft.query.get(obj_id)
+    return jsonify({
+        'tags': tags,
+        'content': content.serialize(),
+    })
 
 @app.route("/api/get_profile", methods=['GET'])
 def get_profile():
@@ -138,7 +187,7 @@ def register():
         username=username).first()
     if registered_user is not None:
         login_user(registered_user)
-        return app.send_static_file('index.html')
+        return send_from_directory('', 'index.html')
     user = User(username, password)
     db.session.add(user)
     db.session.commit()
@@ -151,6 +200,7 @@ def register():
 
 # Routing
 
+@app.route("/editor", defaults={'mode':1, 'obj_id':0})
 @app.route("/editor/<int:mode>/<int:obj_id>")
 @login_required
 def route_editor(mode, obj_id):
@@ -159,7 +209,6 @@ def route_editor(mode, obj_id):
 @app.route("/")
 def route_home():
     return render_template('index.html')
-    return app.send_static_file('index.html')
 
 @app.route("/profile")
 @login_required
@@ -167,11 +216,11 @@ def route_profile():
     if current_user is None:
         return redirect(url_for('route_home'))
     else:
-        return app.send_static_file('index.html')
+        return send_from_directory('', 'index.html')
 
 @app.route("/register")
 def route_register():
-    return app.send_static_file('index.html')
+    return send_from_directory('', 'index.html')
 
 if __name__ == '__main__':
     app.secret_key = "super secret key"

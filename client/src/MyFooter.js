@@ -3,8 +3,6 @@ import Footer from 'grommet/components/Footer';
 import Title from 'grommet/components/Title';
 import Box from 'grommet/components/Box';
 import {
-  BrowserRouter as Router,
-  Route,
   Link
 } from 'react-router-dom';
 import Menu from 'grommet/components/Menu';

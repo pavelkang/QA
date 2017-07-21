@@ -1,11 +1,8 @@
 import React, {Component} from 'react';
-import App from 'grommet/components/App';
-
 import Form from 'grommet/components/Form';
 import Header from 'grommet/components/Header';
 import Heading from 'grommet/components/Heading';
 import FormField from 'grommet/components/FormField';
-import Footer from 'grommet/components/Footer';
 import Button from 'grommet/components/Button';
 import TextInput from 'grommet/components/TextInput';
 import axios from 'axios';

@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
 import App from 'grommet/components/App';
-import Title from 'grommet/components/Title';
-import Header from 'grommet/components/Header';
 import Anchor from 'grommet/components/Anchor';
 import LoginForm from 'grommet/components/LoginForm';
 import BookIcon from 'grommet/components/icons/base/Book';
