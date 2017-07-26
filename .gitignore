@@ -4,3 +4,4 @@ client/build
 venv
 .DS_Store
 server/migrations
+.idea/*
