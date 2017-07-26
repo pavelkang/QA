@@ -28,14 +28,26 @@ var getTitleDOM = function(titleStr, id, ts_published) {
 export default class WikiList extends Component {
 
   deleteWiki(id) {
-    axios.post("/api/delete_wiki/" + id, {})
+    var api_addr;
+    if (this.props.isDrafts) {
+      api_addr = "/api/delete_draft/" + id;
+    } else {
+      api_addr = "/api/delete_wiki/" + id;
+    }
+    axios.post(api_addr, {})
       .then((r) => {
-        alert("Deleted!");
-        window.location.href = "/";
+        if (this.props.isDrafts) {
+          alert("Deleted draft!");
+          window.location.replace("/");
+        } else {
+          alert("Deleted wiki!");
+          window.location.replace("/profile");
+        }
       });
   }
 
   render() {
+    console.log(this.props.data);
     if (!this.props.data) {
       return (
           <Box align="center" justify="center" primary={true} flex="grow" pad="large">
@@ -61,14 +73,15 @@ export default class WikiList extends Component {
                 <div className="actions-menu">
                 <Menu icon={<MoreIcon />}
               dropAlign={{"left": "left"}}>
-                <Anchor icon={<EditIcon />} path={"/editor/1/"+qa.id}> edit </Anchor>
+                <Anchor icon={<EditIcon />}
+              path={this.props.isDrafts ? ("/editor/2/"+qa.id) : ("/editor/1/"+qa.id)}> edit </Anchor>
                 <Anchor icon={<TrashIcon />} onClick={this.deleteWiki.bind(this, qa.id)} > delete </Anchor>
                 </Menu>
                 </div>
 
                 <div className="list-content">
                 <center>
-                <RenderedContent content={qa.a} />
+                <RenderedContent content={qa.a} showPlaceHolder={true}/>
                 </center>
                 </div>
 

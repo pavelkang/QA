@@ -12,7 +12,7 @@ import Anchor from 'grommet/components/Anchor';
 export default class MyFooter extends Component {
   render() {
     return (
-<Footer justify='between' primary={false} className="footer">
+        <Footer justify='between' className="footer" primary={true}>
   <Title>
     <Link to="/" id="nounder">MyWiki</Link>
   </Title>

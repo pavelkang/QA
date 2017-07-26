@@ -8,7 +8,7 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(80), nullable=False)
 
     def __init__(self, username, password):
         self.username = username
@@ -146,6 +146,9 @@ class Draft(db.Model, ContentMixin):
         output.update({
             'ts_created': self.ts_created,
         })
+        output['q'] = self.question
+        output['a'] = ContentMixin.parse_answer(self.answer)
+        output['raw_a'] = self.answer
         return output
 
 

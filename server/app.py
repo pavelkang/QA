@@ -2,7 +2,7 @@ import jinja2
 import os
 from flask import Flask, redirect, render_template, request, jsonify, url_for, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_required, login_user, current_user
+from flask_login import LoginManager, login_required, login_user, current_user, logout_user
 
 ROOT_DIR = '/Users/kai/myWiki'
 STATIC_DIR = '{}/client/build'.format(ROOT_DIR)
@@ -46,6 +46,27 @@ def unauthorized():
     return "No way"
 
 
+@app.route("/api/log_in", methods=['POST'])
+def log_in():
+    username = request.args.get('username')
+    password = request.args.get('password')
+    user = User.query.filter_by(
+        username=username,
+        password=password,
+    ).first()
+    print user
+    if user is None:
+        return jsonify({'error': 'No such user'})
+    else:
+        login_user(user)
+        return redirect(url_for('route_home'))
+
+
+@app.route("/api/log_out", methods=['GET'])
+def log_out():
+    logout_user()
+    return redirect(url_for('route_login'))
+
 @app.route("/api/add_tag", methods=['POST'])
 def add_tag():
     if current_user is None:
@@ -66,7 +87,9 @@ def get_tag():
 def add_wiki():
     if current_user is None:
         return redirect(url_for('route_register'))
-    wiki = Wiki(request.json['q'], request.json['a'], current_user.id)
+    wiki = Wiki(request.json['content']['q'],
+                request.json['content']['a'],
+                current_user.id)
     for tagId in request.json['content']['tagIds']:
         tag = Category.query.get(tagId)
         if tag is not None:
@@ -91,8 +114,22 @@ def save_draft():
 @login_required
 def update_wiki():
     wiki = Wiki.query.get(request.json['wiki_id'])
+    if wiki is None or wiki.author_id != current_user.id:
+        return jsonify({'error': 'Not authorized'})
     wiki.question = request.json['content']['q']
     wiki.answer = request.json['content']['a']
+    db.session.commit()
+    return jsonify({})
+
+
+@app.route("/api/update_draft", methods=['POST'])
+@login_required
+def update_draft():
+    draft = Draft.query.get(request.json['draft_id'])
+    if draft is None or draft.author_id != current_user.id:
+        return jsonify({'error': 'Not authorized'})
+    draft.question = request.json['content']['q']
+    draft.answer = request.json['content']['a']
     db.session.commit()
     return jsonify({})
 
@@ -149,7 +186,7 @@ def get_profile():
     response = {
         'username': current_user.username,
         'tags': map(lambda c: c.serialize(), current_user.categories),
-        'drafts': [],
+        'drafts': map(lambda d: d.serialize(), current_user.draft),
         'numWikis': current_user.wiki.count(),
     }
     return jsonify(response)
@@ -161,7 +198,19 @@ def delete_wiki(wiki_id):
         db.session.delete(wiki_to_delete)
         db.session.commit()
         return jsonify({})
-    return jsonify({})
+    else:
+        return jsonify({'error': 'Not authorized to delete it.'})
+
+
+@app.route("/api/delete_draft/<int:draft_id>", methods=['POST'])
+def delete_draft(draft_id):
+    draft_to_delete = Draft.query.get(draft_id)
+    if draft_to_delete.author_id == current_user.id:
+        db.session.delete(draft_to_delete)
+        db.session.commit()
+        return jsonify({})
+    else:
+        return jsonify({'error': 'Not authorized to delete it.'})
 
 
 @app.route("/api/preview", methods=['POST'])
@@ -176,8 +225,18 @@ def preview():
 def get_wiki():
     if current_user is None:
         redirect(url_for('route_register'))
+    query = request.args.get('q')
     serialized_wikis = map(lambda w: w.serialize(), current_user.wiki)
-    return jsonify(serialized_wikis)
+    if query is None:
+        return jsonify(serialized_wikis)
+    # Simple Search here
+    searchable_texts = [(o['q']+o['raw_a']).lower() for o in serialized_wikis]
+    results = []
+    for i in xrange(len(searchable_texts)):
+        t = searchable_texts[i]
+        if query in t.lower():
+            results.append(serialized_wikis[i])
+    return jsonify(results)
 
 
 @app.route("/api/register", methods=['POST'])
@@ -186,8 +245,7 @@ def register():
     registered_user = User.query.filter_by(
         username=username).first()
     if registered_user is not None:
-        login_user(registered_user)
-        return send_from_directory('', 'index.html')
+        return jsonify({'error': 'Username taken'})
     user = User(username, password)
     db.session.add(user)
     db.session.commit()
@@ -208,6 +266,8 @@ def route_editor(mode, obj_id):
 
 @app.route("/")
 def route_home():
+    if not current_user.is_authenticated:
+        return redirect(url_for('route_login'))
     return render_template('index.html')
 
 @app.route("/profile")
@@ -216,11 +276,16 @@ def route_profile():
     if current_user is None:
         return redirect(url_for('route_home'))
     else:
-        return send_from_directory('', 'index.html')
+        return render_template('index.html')
+
+
+@app.route("/login")
+def route_login():
+    return render_template('index.html')
 
 @app.route("/register")
 def route_register():
-    return send_from_directory('', 'index.html')
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.secret_key = "super secret key"

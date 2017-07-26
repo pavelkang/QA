@@ -150,27 +150,35 @@ export default class WikiEditor extends Component {
   }
 
   saveDraft() {
-
-    axios.post('/api/save_draft', this.getContent())
-      .then((r) => {
-        alert('saved as draft!');
-        var newStatus = {
-          mode: EDIT_DRAFT,
-          obj_id: r.data.draft_id,
-        };
-        this.setState({
-          status: newStatus,
+    if (this.state.status.mode === EDIT_DRAFT) {
+      axios.post('/api/update_draft', this.getContent())
+        .then((r) => {
+          alert('updated draft!');
         });
-      });
+    } else {
+      axios.post('/api/save_draft', this.getContent())
+        .then((r) => {
+          alert('saved as draft!');
+          var newStatus = {
+            mode: EDIT_DRAFT,
+            obj_id: r.data.draft_id,
+          };
+          this.setState({
+            status: newStatus,
+          });
+        });
+    }
   }
 
   submit() {
 
     switch (this.state.status.mode) {
     case CREATE_FROM_SCRATCH:
-      axios.post('/api/add_wiki', this.getContent())
+      axios.post('/api/add_wiki', {
+        'content': this.getContent(),
+      })
         .then((r) => {
-          window.location.href = "/";
+          window.location.replace("/");
         });
       break;
     case EDIT_WIKI:
@@ -179,7 +187,7 @@ export default class WikiEditor extends Component {
         'wiki_id': this.state.status.obj_id,
       })
         .then((r) => {
-          window.location.href = "/";
+          window.location.replace("/");
         })
       break;
     case EDIT_DRAFT:
@@ -188,7 +196,7 @@ export default class WikiEditor extends Component {
         'draft_id': this.state.status.obj_id,
       })
         .then((r) => {
-          window.location.href = "/";
+          window.location.replace("/");
         })
       break;
     }
@@ -199,7 +207,7 @@ export default class WikiEditor extends Component {
   render() {
     return (
         <App>
-
+        <Box pad="medium" responsive={true}>
         {
           ((this.state.status.mode !== CREATE_FROM_SCRATCH) && this.state.ready === false) ? <Spinning /> :
             <div>
@@ -214,7 +222,7 @@ export default class WikiEditor extends Component {
           responsive={false}>
             </Box>
             <Button icon={<SaveIcon />}
-          label='Save as draft'
+          label={this.state.status.mode === EDIT_DRAFT ? 'Update draft' : 'Save as draft'}
           onClick={this.saveDraft.bind(this)}
           secondary={true}></Button>
             <Button icon={<ViewIcon />}
@@ -256,6 +264,7 @@ export default class WikiEditor extends Component {
             </div>
         }
         <MyFooter/>
+        </Box>
         </App>
     )
   }

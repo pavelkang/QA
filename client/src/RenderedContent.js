@@ -16,6 +16,13 @@ export default class RenderedContent extends Component {
   render() {
     var content = this.props.content;
     var html_string = "";
+    if (this.props.showPlaceHolder &&
+        (content.length === 0 || (content.length === 1 && content[0].content === "\n"))) {
+      content.push({
+        "content": "\n\n### Nothing to show yet. Please edit.",
+        "type": "md",
+      });
+    }
     for (var i = 0; i < content.length; i++) {
       if (content[i].type === "code") {
         var code = Prism.highlight(content[i].content, Prism.languages['python']);

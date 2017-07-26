@@ -5,20 +5,43 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='index.css') }}">
+  <link rel="stylesheet" type="text/css" href="index.css">
+  <link rel="stylesheet" type="text/css" href="katex.css">
+  <link rel="stylesheet" type="text/css" href="prism.css">
+  <link rel="stylesheet" type="text/css" href="draft.css">
+  <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='index.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='katex.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='prism.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='draft.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='draft.css') }}"> -->
   <title>My Wiki</title>
   <style>
     body {
       min-height: 100vh;
     }
-
+   .user-values {
+       padding-left: 20px;
+       padding-right: 20px;
+   }
+   .center-content {
+       position: fixed;
+       top: 50%;
+       left: 50%;
+       /* bring your own prefixes */
+       transform: translate(-50%, -60%);
+   }
+   #root {
+       width: 100vw;
+       height: 100vh;
+   }
     .answers {
       padding-left: 10px;
     }
-
+   .login-button {
+       padding-top: 25px;
+   }
+   .login-text {
+       padding-top: 20px;
+   }
     strong {
       color: #4367b1;
     }
@@ -56,9 +79,6 @@
       font-size: 14px;
       padding: 23px;
     }
-   #register-text {
-       padding-left: 24px;
-   }
    .list-body {
        position: relative;
    }

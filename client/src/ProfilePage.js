@@ -9,6 +9,7 @@ import List from 'grommet/components/List';
 import ListItem from 'grommet/components/ListItem';
 import Box from 'grommet/components/Box';
 import MyFooter from './MyFooter';
+import WikiList from './WikiList';
 
 class InnerProfilePage extends Component {
 
@@ -31,7 +32,7 @@ class InnerProfilePage extends Component {
     })
       .then((r) => {
         alert('Added a new tag');
-        window.location.href = '/profile';
+        window.location.replace('/profile');
       });
   }
 
@@ -46,8 +47,14 @@ class InnerProfilePage extends Component {
         <Box basis='1/2' justify='center' margin='medium' pad='medium'>
         <Heading tag="h1">{data.username}</Heading>
         <hr/>
+        <Box direction="row" alignSelf="center">
+        <div className="user-values">
         <Value label='wikis' value={data.numWikis}/>
+        </div>
+        <div className="user-values">
         <Value label='drafts' value={data.drafts.length}/>
+        </div>
+        </Box>
         <Heading tag="h2">Tags:</Heading>
         <hr/>
         <Box pad='medium' margin='medium'>
@@ -65,18 +72,16 @@ class InnerProfilePage extends Component {
         }
       </List>
         </Box>
-        <center>
+        <Box alignSelf="center">
         <TextInput value={this.state.newTag} onDOMChange={this.changeTag.bind(this)} placeHolder='new tag name'/>
         <br/>
-        <Box pad='medium'>
         <Button onClick={this.addTag.bind(this)} label="Add a new tag"/>
         </Box>
-        </center>
         <Heading tag="h2">Drafts:</Heading>
         <hr/>
-        <Heading tag="h4">Not implemented</Heading>
-        </Box>
+        <WikiList data={data.drafts} isDrafts={true}/>
         <MyFooter />
+        </Box>
         </div>
     );
   }
@@ -87,12 +92,7 @@ export default class ProfilePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: {
-        'username': 'test_kai',
-        'tags': [{'name': 'ml'}, {'name': 'programming'}],
-        'drafts': [{}, {}, {}, {}, {}],
-        'numWikis': 14,
-      },
+      data: null,
     };
     axios.get('/api/get_profile')
       .then(
@@ -101,7 +101,7 @@ export default class ProfilePage extends Component {
             data: r.data,
           });
         }
-      )
+      );
   }
 
   render() {
