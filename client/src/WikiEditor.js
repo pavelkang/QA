@@ -150,8 +150,12 @@ export default class WikiEditor extends Component {
   }
 
   saveDraft() {
+    console.log(this.state.status);
     if (this.state.status.mode === EDIT_DRAFT) {
-      axios.post('/api/update_draft', this.getContent())
+      axios.post('/api/update_draft', {
+        'draft_id': this.state.status.obj_id,
+        'content': this.getContent(),
+      })
         .then((r) => {
           alert('updated draft!');
         });
